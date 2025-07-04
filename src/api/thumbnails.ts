@@ -5,6 +5,7 @@ import type { ApiConfig } from "../config";
 import type { BunRequest } from "bun";
 import { BadRequestError, NotFoundError, UserForbiddenError } from "./errors";
 import path from "path";
+import { randomBytes } from "crypto";
 
 type Thumbnail = {
   data: ArrayBuffer;
@@ -49,7 +50,7 @@ export async function handlerUploadThumbnail(cfg: ApiConfig, req: BunRequest) {
     throw new BadRequestError("Thumbnail file type are not supported");
   }
   const [type, subtype] = fileType.split("/");
-  const filename = `${videoId}.${subtype}`;
+  const filename = `${randomBytes(32).toString("base64url")}.${subtype}`;
   const filepath = path.join(cfg.assetsRoot, filename);
 
   await Bun.write(filepath, Buffer.from(arrayBuffer));
