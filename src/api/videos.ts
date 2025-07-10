@@ -59,14 +59,12 @@ export async function handlerUploadVideo(cfg: ApiConfig, req: BunRequest) {
   await s3file.write(videoFile, { type: "video/mp4" });
 
   const videoURL = s3Key;
-  video.videoURL = videoURL;
+  video.videoURL = `${cfg.s3CfDistribution}/${videoURL}`;
   updateVideo(cfg.db, video);
-
-  const signedVideo = await dbVideoToSignedVideo(cfg, video);
 
   await Promise.all([rm(tempFilePath, { force: true }), rm(processedFilePath, { force: true })]);
 
-  return respondWithJSON(200, signedVideo);
+  return respondWithJSON(200, video);
 }
 
 
